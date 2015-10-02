@@ -23,7 +23,7 @@
 # IN THE WORK.
 #----------------------------------------------------------------------
 """
-Framework to run a GENI Aggregate Manager. See geni/am for the 
+Framework to run a GENI Aggregate Manager. See geni/am for the
 Reference Aggregate Manager that this runs.
 
 Run with "-h" flag to see usage and command line options.
@@ -62,9 +62,9 @@ def parse_args(argv):
                       help="Trusted Root certificates directory (files in PEM format)", metavar="FILE")
     # Could try to determine the real IP Address instead of the loopback
     # using socket.gethostbyname(socket.gethostname())
-    parser.add_option("-H", "--host", 
+    parser.add_option("-H", "--host",
                       help="server ip", metavar="HOST")
-    parser.add_option("-p", "--port", type=int, 
+    parser.add_option("-p", "--port", type=int,
                       help="server port", metavar="PORT")
     parser.add_option("--debug", action="store_true", default=False,
                        help="enable debugging output")
@@ -101,26 +101,26 @@ def main(argv=None):
     if not opts.configfile is None:
         optspath = os.path.expanduser(opts.configfile)
 
-    config = read_config(optspath)   
-        
-    for (key,val) in config['aggregate_manager'].items():                  
+    config = read_config(optspath)
+
+    for (key,val) in config['aggregate_manager'].items():
         if hasattr(opts,key) and getattr(opts,key) is None:
             setattr(opts,key,val)
         if not hasattr(opts,key):
-            setattr(opts,key,val)            
+            setattr(opts,key,val)
     if getattr(opts,'rootcadir') is None:
-        setattr(opts,'rootcadir',config['global']['rootcadir'])        
+        setattr(opts,'rootcadir',config['global']['rootcadir'])
 
     if opts.rootcadir is None:
         sys.exit('Missing path to trusted root certificate directory (-r argument)')
-    
+
     certfile = getAbsPath(opts.certfile)
     keyfile = getAbsPath(opts.keyfile)
     if not os.path.exists(certfile):
         sys.exit("Aggregate certfile %s doesn't exist" % certfile)
     if not os.path.getsize(certfile) > 0:
         sys.exit("Aggregate certfile %s is empty" % certfile)
-    
+
     if not os.path.exists(keyfile):
         sys.exit("Aggregate keyfile %s doesn't exist" % keyfile)
     if not os.path.getsize(keyfile) > 0:
@@ -138,7 +138,7 @@ def main(argv=None):
         authorizer_classname = opts.authorizer
     else:
         authorizer_classname = "gcf.geni.auth.sfa_authorizer.SFA_Authorizer"
-    authorizer = getInstanceFromClassname(authorizer_classname, 
+    authorizer = getInstanceFromClassname(authorizer_classname,
                                           getAbsPath(opts.rootcadir), opts, argument_guard)
 
     # Use XMLRPC authorizer if opt.remote_authorizer is set
@@ -146,7 +146,7 @@ def main(argv=None):
         import xmlrpclib
         authorizer = xmlrpclib.Server(opts.remote_authorizer)
 
-    # Instantiate resource manager from 'authorizer_resource_manager' 
+    # Instantiate resource manager from 'authorizer_resource_manager'
     # config argument. Default = None
     resource_manager = None
     if hasattr(opts, 'authorizer_resource_manager'):
@@ -156,8 +156,8 @@ def main(argv=None):
     delegate=None
     if hasattr(opts, 'delegate') and opts.delegate is not None and str(opts.delegate).strip() != "":
         try:
-            delegate = getInstanceFromClassname(opts.delegate, 
-                                                getAbsPath(opts.rootcadir), 
+            delegate = getInstanceFromClassname(opts.delegate,
+                                                getAbsPath(opts.rootcadir),
                                                 config['global']['base_name'],
                                                 "https://%s:%d/" % (opts.host, int(opts.port)),
                                                 **vars(opts)
@@ -187,7 +187,7 @@ def main(argv=None):
                                                      certfile=certfile,
                                                      trust_roots_dir=getAbsPath(opts.rootcadir),
                                                      ca_certs=comboCertsFile,
-                                                     base_name=config['global']['base_name'], 
+                                                     base_name=config['global']['base_name'],
                                                      authorizer=authorizer,
                                                      resource_manager=resource_manager,
                                                      delegate=delegate)
