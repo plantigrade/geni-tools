@@ -72,6 +72,8 @@ def parse_args(argv):
                       help="AM API Version", default=2)
     parser.add_option("-D", "--delegate", metavar="DELEGATE",
                       help="Classname of aggregate delegate to instantiate (if none, reference implementation is used)")
+    parser.add_option("-l", "--logfile", metavar="FILE",
+                      help="log file path")
     return parser.parse_args()
 
 def getAbsPath(path):
@@ -94,7 +96,11 @@ def main(argv=None):
     level = logging.INFO
     if opts.debug:
         level = logging.DEBUG
-    logging.basicConfig(level=level)
+    try:
+        logargs = {'level': level, 'filename':opts.logfile}
+    except NameError:
+        logargs = {'level': level}
+    logging.basicConfig(**logargs)
 
     # Read in config file options, command line gets priority
     optspath = None
