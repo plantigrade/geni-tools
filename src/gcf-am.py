@@ -213,6 +213,7 @@ def main(argv=None):
             import daemon
             with daemon.DaemonContext():
                 ams.serve_forever()
+                logging.getLogger('gcf-am').info("gcf-am started as daemon")
         except ImportError, e:
             msg = "Could not launch service as a daemon"
             msg += e.message
