@@ -97,7 +97,8 @@ def main(argv=None):
     if opts.debug:
         level = logging.DEBUG
     try:
-        logargs = {'level': level, 'filename':opts.logfile}
+        logargs = {'level': level, 'filename':opts.logfile,
+                   'format': '%(asctime)-15s %(level)s : %(message)s'}
     except NameError:
         logargs = {'level': level}
     logging.basicConfig(**logargs)
