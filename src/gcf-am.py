@@ -72,6 +72,8 @@ def parse_args(argv):
                       help="AM API Version", default=2)
     parser.add_option("-D", "--delegate", metavar="DELEGATE",
                       help="Classname of aggregate delegate to instantiate (if none, reference implementation is used)")
+    parser.add_option("-d", "--daemonize", action="store_true", default=False,
+                      help="launch gcf-am as a daemon - this adds python-daemon as a dependency")
     return parser.parse_args()
 
 def getAbsPath(path):
@@ -206,7 +208,18 @@ def main(argv=None):
         sys.exit(msg % (opts.api_version))
 
     logging.getLogger('gcf-am').info('GENI AM (v%s) Listening on port %s...' % (opts.api_version, opts.port))
-    ams.serve_forever()
+    if opts.daemonize:
+        try:
+            import daemon
+            with daemon.DaemonContext():
+                ams.serve_forever()
+        except ImportError, e:
+            msg = "Could not launch service as a daemon"
+            msg += e.message
+            logging.getLogger('gcf-am').error(msg)
+            sys.exit(msg)
+    else:
+        ams.serve_forever()
 
 if __name__ == "__main__":
     sys.exit(main())
